@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+/*
+  VitalCare - tokens de diseño (Tailwind v4).
+  Todo lo que se declara en @theme genera utilidades: bg-brand-500, text-ink,
+  border-hairline, font-heading, etc.
+*/
+@theme {
+  /* Tipografia: caracter, no Inter/system-ui por defecto */
+  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+
+  /* Fondo crema / hueso calido en vez de blanco puro o gris frio */
+  --color-cream-50: #fdfcfa;
+  --color-cream-100: #faf9f6;
+  --color-cream-200: #f2f0e9;
+  --color-cream-300: #e7e3d8;
+  --color-cream-400: #d7d2c3;
+
+  /* Teal principal apagado y sofisticado (no el #14b8a6 generico) */
+  --color-brand-50: #e9f1ed;
+  --color-brand-100: #c6ded4;
+  --color-brand-200: #9cc6b6;
+  --color-brand-300: #69a892;
+  --color-brand-400: #3b8a71;
+  --color-brand-500: #0f6e56;
+  --color-brand-600: #0c5a46;
+  --color-brand-700: #0a4637;
+  --color-brand-800: #073328;
+  --color-brand-900: #05231c;
+
+  /* Acento coral / terracota suave - usar con moderacion */
+  --color-accent-400: #e27c58;
+  --color-accent-500: #d85a30;
+  --color-accent-600: #b8481f;
+
+  /* Neutros calidos */
+  --color-ink: #1e2421;
+  --color-muted: #6a716a;
+  --color-hairline: #e3e0d6;
+
+  /* Radios sutiles, nada tipo "pill" por todos lados */
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    background-color: var(--color-cream-100);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-heading);
+    font-weight: 500; /* medium/semibold, nunca 800-900 */
+    letter-spacing: -0.01em;
+  }
+
+  /* Foco visible y coherente con la marca */
+  :focus-visible {
+    outline: 2px solid var(--color-brand-400);
+    outline-offset: 2px;
+  }
+}
