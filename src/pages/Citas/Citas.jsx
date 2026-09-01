@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { CalendarClock, MapPin, Plus, Loader2 } from 'lucide-react'
 
 import PageHeader from '../../components/PageHeader.jsx'
+import AgendarCitaModal from '../../components/AgendarCitaModal.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { listarMisCitas } from '../../api/citas.js'
 
@@ -38,15 +39,23 @@ export default function Citas() {
   const [citas, setCitas] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [modalAbierto, setModalAbierto] = useState(false)
 
-  useEffect(() => {
+  function cargarCitas() {
     if (!user?.pacienteId) return
-
+    setLoading(true)
     listarMisCitas(user.pacienteId)
       .then(setCitas)
       .catch(() => setError('No se pudieron cargar tus citas.'))
       .finally(() => setLoading(false))
-  }, [user?.pacienteId])
+  }
+
+  useEffect(cargarCitas, [user?.pacienteId])
+
+  function handleCitaCreada() {
+    setModalAbierto(false)
+    cargarCitas()
+  }
 
   return (
     <>
@@ -57,6 +66,7 @@ export default function Citas() {
         action={
           <button
             type="button"
+            onClick={() => setModalAbierto(true)}
             className="inline-flex items-center gap-2 rounded-lg bg-accent-500 px-4 py-2.5 text-sm font-medium text-cream-50 shadow-sm transition-colors hover:bg-accent-600"
           >
             <Plus className="size-4" strokeWidth={1.75} />
@@ -115,6 +125,14 @@ export default function Citas() {
           </li>
         ))}
       </ul>
+
+      {modalAbierto && (
+        <AgendarCitaModal
+          pacienteId={user.pacienteId}
+          onClose={() => setModalAbierto(false)}
+          onCreada={handleCitaCreada}
+        />
+      )}
     </>
   )
 }
