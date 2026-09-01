@@ -1,29 +1,18 @@
 import api from './axios.js'
 
-/*
-  Endpoints de autenticacion.
-  Firmas dejadas listas; la implementacion real la conectas tu.
-  Ajusta las rutas ('/auth/login', etc.) a las de tu API de Spring Boot.
-*/
-
 /**
  * @param {{ username: string, password: string }} credentials
  * @returns {Promise<{ token: string, username: string, rol: string }>}
  */
 export async function login(credentials) {
-  // TODO: const { data } = await api.post('/auth/login', credentials)
-  // TODO: return data
-  throw new Error('api/auth.login() todavia no implementado')
+  const { data } = await api.post('/auth/login', credentials)
+  return data
 }
 
 /**
- * @param {{ username: string, password: string, rol: string }} payload
+ * @param {{ username: string, password: string, rol: string, pacienteId?: number|null, doctorId?: number|null }} payload
  */
 export async function register(payload) {
-  // TODO: const { data } = await api.post('/auth/register', payload)
-  // TODO: return data
-  throw new Error('api/auth.register() todavia no implementado')
+  const { data } = await api.post('/auth/registro', payload)
+  return data
 }
-
-// `api` se importa para tenerlo a mano al descomentar los TODO de arriba.
-void api

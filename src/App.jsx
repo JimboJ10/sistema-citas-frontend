@@ -1,8 +1,9 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 import AppLayout from './components/AppLayout.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 
+import Landing from './pages/Landing/Landing.jsx'
 import Login from './pages/Login/Login.jsx'
 import Registro from './pages/Registro/Registro.jsx'
 import Citas from './pages/Citas/Citas.jsx'
@@ -15,7 +16,7 @@ export default function App() {
   return (
     <Routes>
       {/* Publicas */}
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/registro" element={<Registro />} />
 
