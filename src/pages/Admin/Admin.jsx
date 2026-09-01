@@ -6,7 +6,9 @@ import CrearAccesoModal from '../../components/CrearAccesoModal.jsx'
 import PageHeader from '../../components/PageHeader.jsx'
 import NuevoDoctorModal from '../../components/NuevoDoctorModal.jsx'
 import NuevaEspecialidadModal from '../../components/NuevaEspecialidadModal.jsx'
+import HorariosModal from '../../components/HorariosModal.jsx'
 import { listarDoctores, listarEspecialidades } from '../../api/catalogo.js'
+import { Clock } from 'lucide-react'
 
 export default function Admin() {
   const [doctores, setDoctores] = useState([])
@@ -16,6 +18,7 @@ export default function Admin() {
   const [modalDoctorAbierto, setModalDoctorAbierto] = useState(false)
   const [modalEspecialidadAbierto, setModalEspecialidadAbierto] = useState(false)
   const [doctorParaAcceso, setDoctorParaAcceso] = useState(null)
+  const [doctorParaHorarios, setDoctorParaHorarios] = useState(null)
 
   function cargarDatos() {
     setLoading(true)
@@ -84,19 +87,28 @@ export default function Admin() {
                     {esp.nombre}
                   </span>
                 ))}
-                
+              </div>
+
+              <div className="mt-4 flex items-center justify-between">
                 {doc.tieneAcceso ? (
-                  <p className="mt-4 text-xs text-brand-600">Tiene acceso al sistema</p>
+                  <p className="text-xs text-brand-600">Tiene acceso al sistema</p>
                 ) : (
                   <button
                     onClick={() => setDoctorParaAcceso(doc)}
-                    className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-accent-600 transition-colors hover:text-accent-700"
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-accent-600 transition-colors hover:text-accent-700"
                   >
                     <KeyRound className="size-3.5" strokeWidth={1.75} />
                     Crear acceso
                   </button>
                 )}
 
+                <button
+                  onClick={() => setDoctorParaHorarios(doc)}
+                  className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-600 transition-colors hover:text-brand-700"
+                >
+                  <Clock className="size-3.5" strokeWidth={1.75} />
+                  Ver horarios
+                </button>
               </div>
             </article>
           ))}
@@ -158,6 +170,13 @@ export default function Admin() {
             setDoctorParaAcceso(null)
             cargarDatos()
           }}
+        />
+      )}
+
+      {doctorParaHorarios && (
+        <HorariosModal
+          doctor={doctorParaHorarios}
+          onClose={() => setDoctorParaHorarios(null)}
         />
       )}
     </>
