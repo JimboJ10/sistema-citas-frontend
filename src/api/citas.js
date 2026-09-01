@@ -26,3 +26,11 @@ export async function cancelarCita(id) {
   })
   return data
 }
+
+/**
+ * @returns {Promise<Array>} todas las citas del sistema (solo ADMIN)
+ */
+export async function listarTodasLasCitas() {
+  const { data } = await api.get('/citas')
+  return data
+}
