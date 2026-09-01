@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 
 import Navbar from './Navbar.jsx'
+import ChatWidget from './ChatWidget.jsx'
 
 /*
   Marco comun de las paginas protegidas: navbar + un contenedor con aire.
@@ -13,6 +14,7 @@ export default function AppLayout() {
       <main className="mx-auto w-full max-w-6xl px-6 py-12 lg:px-10 lg:py-16">
         <Outlet />
       </main>
+      <ChatWidget />
     </div>
   )
 }

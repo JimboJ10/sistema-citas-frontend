@@ -1,43 +1,21 @@
-import { useState } from 'react'
-import { Send } from 'lucide-react'
-// import { enviarMensaje } from '../../api/chat.js'
-
-/* TODO: reemplazar por el historial real de la conversacion. */
-const MENSAJES_DEMO = [
-  {
-    id: 1,
-    autor: 'bot',
-    texto:
-      'Hola, soy el asistente de VitalCare. Puedo ayudarte a agendar, mover o consultar tus citas.',
-  },
-  { id: 2, autor: 'user', texto: 'Quiero reprogramar mi cita de cardiologia.' },
-  {
-    id: 3,
-    autor: 'bot',
-    texto:
-      'Tu proxima cita de cardiologia es el 3 de septiembre a las 09:30 con la Dra. Elena Ruiz. Para que fecha te gustaria moverla?',
-  },
-]
+import { useEffect, useRef } from 'react'
+import { Send, Loader2 } from 'lucide-react'
+import { useChat } from '../../hooks/useChat.js'
 
 export default function Chat() {
-  const [mensajes, setMensajes] = useState(MENSAJES_DEMO)
-  const [texto, setTexto] = useState('')
+  const { mensajes, enviar, loading, error } = useChat()
+  const inputRef = useRef(null)
+  const scrollRef = useRef(null)
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
+  }, [mensajes])
 
   function handleSubmit(e) {
     e.preventDefault()
-    const value = texto.trim()
-    if (!value) return
-
-    // Solo se agrega el mensaje del usuario a la UI.
-    setMensajes((prev) => [
-      ...prev,
-      { id: Date.now(), autor: 'user', texto: value },
-    ])
-    setTexto('')
-
-    // TODO: llamar a la API y agregar la respuesta del bot
-    //   const { respuesta } = await enviarMensaje(value, conversationId)
-    //   setMensajes((prev) => [...prev, { id: Date.now(), autor: 'bot', texto: respuesta }])
+    const value = inputRef.current.value
+    enviar(value)
+    inputRef.current.value = ''
   }
 
   return (
@@ -50,7 +28,7 @@ export default function Chat() {
       </header>
 
       <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-hairline bg-cream-50 shadow-sm">
-        <div className="flex-1 space-y-4 overflow-y-auto px-5 py-6">
+        <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-5 py-6">
           {mensajes.map((m) => (
             <div
               key={m.id}
@@ -67,22 +45,37 @@ export default function Chat() {
               </div>
             </div>
           ))}
+
+          {loading && (
+            <div className="flex justify-start">
+              <div className="flex items-center gap-2 rounded-xl bg-cream-200 px-4 py-2.5 text-sm text-muted">
+                <Loader2 className="size-3.5 animate-spin" strokeWidth={1.75} />
+                Escribiendo...
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Input fijo abajo dentro del panel */}
+        {error && (
+          <p className="border-t border-hairline bg-accent-50 px-4 py-2 text-sm text-accent-700">
+            {error}
+          </p>
+        )}
+
         <form
           onSubmit={handleSubmit}
           className="flex items-center gap-3 border-t border-hairline px-4 py-3"
         >
           <input
-            value={texto}
-            onChange={(e) => setTexto(e.target.value)}
+            ref={inputRef}
             placeholder="Escribe un mensaje..."
-            className="flex-1 rounded-lg border border-hairline bg-cream-100 px-3.5 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted/60 focus:border-brand-400 focus:ring-2 focus:ring-brand-500/15"
+            disabled={loading}
+            className="flex-1 rounded-lg border border-hairline bg-cream-100 px-3.5 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted/60 focus:border-brand-400 focus:ring-2 focus:ring-brand-500/15 disabled:opacity-60"
           />
           <button
             type="submit"
-            className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg bg-brand-500 text-cream-50 transition-colors hover:bg-brand-600"
+            disabled={loading}
+            className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg bg-brand-500 text-cream-50 transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
             aria-label="Enviar mensaje"
           >
             <Send className="size-4" strokeWidth={1.75} />

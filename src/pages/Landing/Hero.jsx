@@ -2,13 +2,11 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, MessageSquareText } from 'lucide-react'
 
 import GeometricPattern from '../../components/GeometricPattern.jsx'
+import { useChatWidget } from '../../context/ChatWidgetContext.jsx'
 
-/*
-  HERO - visible al cargar, sin animacion de scroll.
-  Mismo lenguaje visual que AuthAside (teal oscuro + patron geometrico).
-  Composicion a dos columnas, contenido alineado a la izquierda.
-*/
 export default function Hero() {
+  const { abrir } = useChatWidget()
+
   return (
     <section
       id="landing-hero"
@@ -27,13 +25,13 @@ export default function Hero() {
           </p>
 
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <Link
-              to="/chat"
+            <button
+              onClick={abrir}
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-accent-500 px-5 py-3 text-sm font-medium text-cream-50 shadow-sm transition-colors hover:bg-accent-600"
             >
               <MessageSquareText className="size-4" strokeWidth={1.75} />
               Hablar con el asistente
-            </Link>
+            </button>
             <Link
               to="/login"
               className="inline-flex items-center justify-center gap-2 rounded-lg border border-cream-100/30 px-5 py-3 text-sm font-medium text-cream-50 transition-colors hover:bg-cream-100/10"
@@ -44,7 +42,6 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Preview de chat: aporta asimetria y evita el "hero centrado" */}
         <div className="relative lg:justify-self-end">
           <div className="w-full max-w-sm rounded-xl border border-cream-100/15 bg-brand-800/60 p-5 backdrop-blur">
             <p className="mb-4 text-xs uppercase tracking-wider text-cream-100/45">

@@ -4,6 +4,7 @@ import ProblemaSolucion from './ProblemaSolucion.jsx'
 import Features from './Features.jsx'
 import Confianza from './Confianza.jsx'
 import CtaFinal from './CtaFinal.jsx'
+import ChatWidget from '../../components/ChatWidget.jsx'
 
 /*
   Landing publica en "/". No usa AppLayout (no lleva Navbar de app).
@@ -29,6 +30,8 @@ export default function Landing() {
           </p>
         </div>
       </footer>
+
+      <ChatWidget />
     </div>
   )
 }

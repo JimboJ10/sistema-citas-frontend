@@ -20,21 +20,17 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/registro" element={<Registro />} />
 
-      {/* Protegidas: comparten Navbar + contenedor via AppLayout */}
+      {/* Comparten Navbar + contenedor via AppLayout, pero no todas requieren login */}
       <Route element={<AppLayout />}>
+        {/* Publica: el chatbot puede usarse sin cuenta (paciente invitado) */}
+        <Route path="/chat" element={<Chat />} />
+
+        {/* Protegidas por rol */}
         <Route
           path="/citas"
           element={
             <ProtectedRoute allowedRoles={['PACIENTE']}>
               <Citas />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/chat"
-          element={
-            <ProtectedRoute>
-              <Chat />
             </ProtectedRoute>
           }
         />

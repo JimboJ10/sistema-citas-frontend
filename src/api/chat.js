@@ -1,18 +1,11 @@
 import api from './axios.js'
 
-/*
-  Chatbot.
-*/
-
 /**
  * @param {string} mensaje
- * @param {string} [conversationId]
- * @returns {Promise<{ respuesta: string, conversationId: string }>}
+ * @param {string} conversationId
+ * @returns {Promise<string>} la respuesta del asistente en texto plano
  */
 export async function enviarMensaje(mensaje, conversationId) {
-  // TODO: const { data } = await api.post('/chat', { mensaje, conversationId })
-  // TODO: return data
-  throw new Error('api/chat.enviarMensaje() todavia no implementado')
+  const { data } = await api.post('/chatbot', { mensaje, conversationId })
+  return data
 }
-
-void api
