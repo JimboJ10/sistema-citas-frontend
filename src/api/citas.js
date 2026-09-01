@@ -1,27 +1,28 @@
 import api from './axios.js'
 
-/*
-  Citas del paciente logueado.
-*/
-
-/** @returns {Promise<Array>} lista de citas del paciente */
-export async function listarMisCitas() {
-  // TODO: const { data } = await api.get('/citas')
-  // TODO: return data
-  throw new Error('api/citas.listarMisCitas() todavia no implementado')
+/**
+ * @param {number} pacienteId
+ * @returns {Promise<Array>} lista de citas del paciente
+ */
+export async function listarMisCitas(pacienteId) {
+  const { data } = await api.get(`/citas/paciente/${pacienteId}`)
+  return data
 }
 
-/** @param {{ especialidadId: number, fecha: string, hora: string }} payload */
+/**
+ * @param {{ pacienteId: number, doctorId: number, fechaHora: string, notas?: string }} payload
+ */
 export async function crearCita(payload) {
-  // TODO: const { data } = await api.post('/citas', payload)
-  // TODO: return data
-  throw new Error('api/citas.crearCita() todavia no implementado')
+  const { data } = await api.post('/citas', payload)
+  return data
 }
 
-/** @param {number} id */
+/**
+ * @param {number} id
+ */
 export async function cancelarCita(id) {
-  // TODO: await api.delete(`/citas/${id}`)
-  throw new Error('api/citas.cancelarCita() todavia no implementado')
+  const { data } = await api.patch(`/citas/${id}/estado`, null, {
+    params: { nuevoEstado: 'CANCELADA' },
+  })
+  return data
 }
-
-void api

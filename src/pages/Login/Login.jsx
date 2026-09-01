@@ -26,7 +26,12 @@ export default function Login() {
 
     try {
       const data = await loginRequest(form)
-      login(data.token, { username: data.username, rol: data.rol })
+      login(data.token, {
+        username: data.username,
+        rol: data.rol,
+        pacienteId: data.pacienteId,
+        doctorId: data.doctorId,
+      })
       navigate('/citas')
     } catch (err) {
       const mensaje =

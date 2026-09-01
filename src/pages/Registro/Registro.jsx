@@ -9,7 +9,13 @@ import { register as registerRequest } from '../../api/auth.js'
 export default function Registro() {
   const navigate = useNavigate()
 
-  const [form, setForm] = useState({ username: '', password: '' })
+  const [form, setForm] = useState({
+    username: '',
+    password: '',
+    nombres: '',
+    apellidos: '',
+    telefono: '',
+  })
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
 
@@ -23,9 +29,7 @@ export default function Registro() {
     setLoading(true)
 
     try {
-      // El rol siempre es PACIENTE del lado del backend, sin importar
-      // lo que se envíe aquí (ver AuthService.registrar en el backend).
-      await registerRequest({ ...form, rol: 'PACIENTE' })
+      await registerRequest(form)
       navigate('/login')
     } catch (err) {
       const mensaje =
@@ -55,6 +59,36 @@ export default function Registro() {
           </p>
 
           <form onSubmit={handleSubmit} className="mt-10 space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <Field
+                label="Nombres"
+                id="nombres"
+                name="nombres"
+                autoComplete="given-name"
+                placeholder="María"
+                value={form.nombres}
+                onChange={update}
+              />
+              <Field
+                label="Apellidos"
+                id="apellidos"
+                name="apellidos"
+                autoComplete="family-name"
+                placeholder="Torres"
+                value={form.apellidos}
+                onChange={update}
+              />
+            </div>
+            <Field
+              label="Teléfono"
+              id="telefono"
+              name="telefono"
+              type="tel"
+              autoComplete="tel"
+              placeholder="0991234567"
+              value={form.telefono}
+              onChange={update}
+            />
             <Field
               label="Usuario"
               id="username"
