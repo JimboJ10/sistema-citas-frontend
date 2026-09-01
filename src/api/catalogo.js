@@ -9,6 +9,14 @@ export async function listarEspecialidades() {
 }
 
 /**
+ * @returns {Promise<Array>} todos los doctores registrados
+ */
+export async function listarDoctores() {
+  const { data } = await api.get('/doctores')
+  return data
+}
+
+/**
  * @param {number} especialidadId
  * @returns {Promise<Array>} doctores que tienen esa especialidad
  */

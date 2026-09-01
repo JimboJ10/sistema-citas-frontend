@@ -1,45 +1,42 @@
-import { Plus, Stethoscope } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Plus, Stethoscope, Loader2 } from 'lucide-react'
 
 import PageHeader from '../../components/PageHeader.jsx'
-// import { useEffect, useState } from 'react'
-// import { listarDoctores, listarEspecialidades } from '../../api/admin.js'
-
-/* TODO: reemplazar por datos reales de la API. */
-const DOCTORES_DEMO = [
-  { id: 1, nombre: 'Dra. Elena Ruiz', especialidad: 'Cardiologia', citasSemana: 18 },
-  { id: 2, nombre: 'Dr. Marco Diaz', especialidad: 'Dermatologia', citasSemana: 12 },
-  { id: 3, nombre: 'Dra. Sofia Prat', especialidad: 'Medicina general', citasSemana: 25 },
-  { id: 4, nombre: 'Dr. Hugo Vera', especialidad: 'Traumatologia', citasSemana: 9 },
-]
-
-const ESPECIALIDADES_DEMO = [
-  'Cardiologia',
-  'Dermatologia',
-  'Medicina general',
-  'Traumatologia',
-  'Pediatria',
-  'Nutricion',
-]
+import NuevoDoctorModal from '../../components/NuevoDoctorModal.jsx'
+import NuevaEspecialidadModal from '../../components/NuevaEspecialidadModal.jsx'
+import { listarDoctores, listarEspecialidades } from '../../api/catalogo.js'
 
 export default function Admin() {
-  // const [doctores, setDoctores] = useState([])
-  // const [especialidades, setEspecialidades] = useState([])
-  // useEffect(() => {
-  //   listarDoctores().then(setDoctores)
-  //   listarEspecialidades().then(setEspecialidades)
-  // }, [])
-  const doctores = DOCTORES_DEMO
-  const especialidades = ESPECIALIDADES_DEMO
+  const [doctores, setDoctores] = useState([])
+  const [especialidades, setEspecialidades] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [modalDoctorAbierto, setModalDoctorAbierto] = useState(false)
+  const [modalEspecialidadAbierto, setModalEspecialidadAbierto] = useState(false)
+
+  function cargarDatos() {
+    setLoading(true)
+    Promise.all([listarDoctores(), listarEspecialidades()])
+      .then(([doc, esp]) => {
+        setDoctores(doc)
+        setEspecialidades(esp)
+      })
+      .catch(() => setError('No se pudieron cargar los datos.'))
+      .finally(() => setLoading(false))
+  }
+
+  useEffect(cargarDatos, [])
 
   return (
     <>
       <PageHeader
-        eyebrow="Administracion"
+        eyebrow="Administración"
         title="Doctores y especialidades"
-        description="Gestiona el equipo medico y el catalogo de especialidades."
+        description="Gestiona el equipo médico y el catálogo de especialidades."
         action={
           <button
             type="button"
+            onClick={() => setModalDoctorAbierto(true)}
             className="inline-flex items-center gap-2 rounded-lg bg-accent-500 px-4 py-2.5 text-sm font-medium text-cream-50 shadow-sm transition-colors hover:bg-accent-600"
           >
             <Plus className="size-4" strokeWidth={1.75} />
@@ -48,23 +45,47 @@ export default function Admin() {
         }
       />
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {doctores.map((doc) => (
-          <article
-            key={doc.id}
-            className="rounded-xl border border-hairline bg-cream-50 p-5 shadow-sm"
-          >
-            <div className="flex size-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
-              <Stethoscope className="size-5" strokeWidth={1.5} />
-            </div>
-            <h2 className="mt-4 text-base font-medium text-ink">{doc.nombre}</h2>
-            <p className="mt-0.5 text-sm text-muted">{doc.especialidad}</p>
-            <p className="mt-4 text-xs text-muted">
-              {doc.citasSemana} citas esta semana
-            </p>
-          </article>
-        ))}
-      </section>
+      {loading && (
+        <div className="flex items-center gap-2 text-sm text-muted">
+          <Loader2 className="size-4 animate-spin" strokeWidth={1.75} />
+          Cargando...
+        </div>
+      )}
+
+      {error && (
+        <p className="mb-4 rounded-lg bg-accent-50 px-4 py-2.5 text-sm text-accent-700">
+          {error}
+        </p>
+      )}
+
+      {!loading && (
+        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {doctores.map((doc) => (
+            <article
+              key={doc.id}
+              className="rounded-xl border border-hairline bg-cream-50 p-5 shadow-sm"
+            >
+              <div className="flex size-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+                <Stethoscope className="size-5" strokeWidth={1.5} />
+              </div>
+              <h2 className="mt-4 text-base font-medium text-ink">
+                {doc.nombres} {doc.apellidos}
+              </h2>
+              <p className="mt-0.5 text-sm text-muted">{doc.email}</p>
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {doc.especialidades?.map((esp) => (
+                  <span
+                    key={esp.id}
+                    className="rounded-md bg-cream-200 px-2 py-0.5 text-xs text-muted"
+                  >
+                    {esp.nombre}
+                  </span>
+                ))}
+              </div>
+            </article>
+          ))}
+        </section>
+      )}
 
       <section className="mt-12">
         <h2 className="text-sm font-medium uppercase tracking-wider text-muted">
@@ -73,23 +94,45 @@ export default function Admin() {
         <ul className="mt-4 flex flex-wrap gap-2">
           {especialidades.map((esp) => (
             <li
-              key={esp}
+              key={esp.id}
               className="rounded-lg border border-hairline bg-cream-50 px-3 py-1.5 text-sm text-ink"
             >
-              {esp}
+              {esp.nombre}
             </li>
           ))}
           <li>
             <button
               type="button"
+              onClick={() => setModalEspecialidadAbierto(true)}
               className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-brand-300 px-3 py-1.5 text-sm text-brand-600 transition-colors hover:bg-brand-50"
             >
               <Plus className="size-3.5" strokeWidth={1.75} />
-              Anadir
+              Añadir
             </button>
           </li>
         </ul>
       </section>
+
+      {modalDoctorAbierto && (
+        <NuevoDoctorModal
+          especialidades={especialidades}
+          onClose={() => setModalDoctorAbierto(false)}
+          onCreado={() => {
+            setModalDoctorAbierto(false)
+            cargarDatos()
+          }}
+        />
+      )}
+
+      {modalEspecialidadAbierto && (
+        <NuevaEspecialidadModal
+          onClose={() => setModalEspecialidadAbierto(false)}
+          onCreada={() => {
+            setModalEspecialidadAbierto(false)
+            cargarDatos()
+          }}
+        />
+      )}
     </>
   )
 }
