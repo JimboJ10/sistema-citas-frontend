@@ -15,7 +15,7 @@ const LINKS_BY_ROLE = {
     { to: '/agenda', label: 'Agenda' },
     { to: '/chat', label: 'Asistente' },
   ],
-  ADMIN: [{ to: '/admin', label: 'Administracion' }],
+  ADMIN: [{ to: '/admin', label: 'Administración' }],
 }
 
 function linkClass({ isActive }) {

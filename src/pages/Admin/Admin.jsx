@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Plus, Stethoscope, Loader2 } from 'lucide-react'
+import { KeyRound } from 'lucide-react'
 
+import CrearAccesoModal from '../../components/CrearAccesoModal.jsx'
 import PageHeader from '../../components/PageHeader.jsx'
 import NuevoDoctorModal from '../../components/NuevoDoctorModal.jsx'
 import NuevaEspecialidadModal from '../../components/NuevaEspecialidadModal.jsx'
@@ -13,6 +15,7 @@ export default function Admin() {
   const [error, setError] = useState(null)
   const [modalDoctorAbierto, setModalDoctorAbierto] = useState(false)
   const [modalEspecialidadAbierto, setModalEspecialidadAbierto] = useState(false)
+  const [doctorParaAcceso, setDoctorParaAcceso] = useState(null)
 
   function cargarDatos() {
     setLoading(true)
@@ -81,6 +84,19 @@ export default function Admin() {
                     {esp.nombre}
                   </span>
                 ))}
+                
+                {doc.tieneAcceso ? (
+                  <p className="mt-4 text-xs text-brand-600">Tiene acceso al sistema</p>
+                ) : (
+                  <button
+                    onClick={() => setDoctorParaAcceso(doc)}
+                    className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-accent-600 transition-colors hover:text-accent-700"
+                  >
+                    <KeyRound className="size-3.5" strokeWidth={1.75} />
+                    Crear acceso
+                  </button>
+                )}
+
               </div>
             </article>
           ))}
@@ -129,6 +145,17 @@ export default function Admin() {
           onClose={() => setModalEspecialidadAbierto(false)}
           onCreada={() => {
             setModalEspecialidadAbierto(false)
+            cargarDatos()
+          }}
+        />
+      )}
+
+      {doctorParaAcceso && (
+        <CrearAccesoModal
+          doctor={doctorParaAcceso}
+          onClose={() => setDoctorParaAcceso(null)}
+          onCreado={() => {
+            setDoctorParaAcceso(null)
             cargarDatos()
           }}
         />

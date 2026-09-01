@@ -17,3 +17,15 @@ export async function crearEspecialidad(payload) {
   const { data } = await api.post('/especialidades', payload)
   return data
 }
+
+/** @param {{ username: string, password: string, doctorId: number }} payload */
+export async function crearAccesoDoctor(payload) {
+  const { data } = await api.post('/auth/usuarios', {
+    username: payload.username,
+    password: payload.password,
+    rol: 'DOCTOR',
+    pacienteId: null,
+    doctorId: payload.doctorId,
+  })
+  return data
+}
