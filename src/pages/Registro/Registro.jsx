@@ -1,25 +1,17 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Loader2 } from 'lucide-react'
 
 import Field from '../../components/Field.jsx'
 import AuthAside from '../../components/AuthAside.jsx'
-// import { register as registerRequest } from '../../api/auth.js'
-
-const ROLES = [
-  { value: 'PACIENTE', label: 'Paciente' },
-  { value: 'DOCTOR', label: 'Doctor' },
-  { value: 'ADMIN', label: 'Administrador' },
-]
+import { register as registerRequest } from '../../api/auth.js'
 
 export default function Registro() {
   const navigate = useNavigate()
 
-  const [form, setForm] = useState({
-    username: '',
-    password: '',
-    rol: 'PACIENTE',
-  })
+  const [form, setForm] = useState({ username: '', password: '' })
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   function update(e) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
@@ -27,11 +19,22 @@ export default function Registro() {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    // TODO: conectar con la API
-    //   await registerRequest(form)   // { username, password, rol }
-    //   navigate('/login')
-    console.log('registro submit (placeholder):', form)
-    navigate('/login')
+    setError(null)
+    setLoading(true)
+
+    try {
+      // El rol siempre es PACIENTE del lado del backend, sin importar
+      // lo que se envíe aquí (ver AuthService.registrar en el backend).
+      await registerRequest({ ...form, rol: 'PACIENTE' })
+      navigate('/login')
+    } catch (err) {
+      const mensaje =
+        err.response?.data?.error ??
+        'No se pudo crear la cuenta. Intenta de nuevo.'
+      setError(mensaje)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -62,47 +65,45 @@ export default function Registro() {
               onChange={update}
             />
             <Field
-              label="Contrasena"
+              label="Contraseña"
               id="password"
               name="password"
               type="password"
               autoComplete="new-password"
-              placeholder="Minimo 8 caracteres"
+              placeholder="Mínimo 8 caracteres"
               value={form.password}
               onChange={update}
             />
-            <Field label="Rol" id="rol">
-              <select
-                id="rol"
-                name="rol"
-                value={form.rol}
-                onChange={update}
-                className="mt-2 block w-full rounded-lg border border-hairline bg-cream-50 px-3.5 py-2.5 text-sm text-ink outline-none transition-colors focus:border-brand-400 focus:ring-2 focus:ring-brand-500/15"
-              >
-                {ROLES.map((r) => (
-                  <option key={r.value} value={r.value}>
-                    {r.label}
-                  </option>
-                ))}
-              </select>
-            </Field>
+
+            {error && (
+              <p className="rounded-lg bg-accent-50 px-4 py-2.5 text-sm text-accent-700">
+                {error}
+              </p>
+            )}
 
             <button
               type="submit"
-              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-cream-50 shadow-sm transition-colors hover:bg-brand-600"
+              disabled={loading}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-cream-50 shadow-sm transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Crear cuenta
-              <ArrowRight className="size-4" strokeWidth={1.75} />
+              {loading ? (
+                <Loader2 className="size-4 animate-spin" strokeWidth={1.75} />
+              ) : (
+                <>
+                  Crear cuenta
+                  <ArrowRight className="size-4" strokeWidth={1.75} />
+                </>
+              )}
             </button>
           </form>
 
           <p className="mt-8 text-sm text-muted">
-            Ya tienes cuenta?{' '}
+            ¿Ya tienes cuenta?{' '}
             <Link
               to="/login"
               className="font-medium text-accent-600 transition-colors hover:text-accent-500"
             >
-              Inicia sesion
+              Inicia sesión
             </Link>
           </p>
         </div>
