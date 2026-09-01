@@ -1,21 +1,21 @@
 import api from './axios.js'
 
-/*
-  Agenda del doctor logueado (citas asignadas).
-*/
-
-/** @returns {Promise<Array>} citas asignadas al doctor */
-export async function listarAgenda() {
-  // TODO: const { data } = await api.get('/agenda')
-  // TODO: return data
-  throw new Error('api/agenda.listarAgenda() todavia no implementado')
+/**
+ * @param {number} doctorId
+ * @returns {Promise<Array>} citas asignadas al doctor
+ */
+export async function listarAgenda(doctorId) {
+  const { data } = await api.get(`/citas/doctor/${doctorId}`)
+  return data
 }
 
-/** @param {number} citaId @param {string} estado */
-export async function actualizarEstadoCita(citaId, estado) {
-  // TODO: const { data } = await api.patch(`/agenda/${citaId}`, { estado })
-  // TODO: return data
-  throw new Error('api/agenda.actualizarEstadoCita() todavia no implementado')
+/**
+ * @param {number} citaId
+ * @param {'PENDIENTE'|'CONFIRMADA'|'CANCELADA'|'COMPLETADA'} nuevoEstado
+ */
+export async function actualizarEstadoCita(citaId, nuevoEstado) {
+  const { data } = await api.patch(`/citas/${citaId}/estado`, null, {
+    params: { nuevoEstado },
+  })
+  return data
 }
-
-void api
