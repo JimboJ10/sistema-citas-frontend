@@ -10,6 +10,7 @@ const LINKS_BY_ROLE = {
   PACIENTE: [
     { to: '/citas', label: 'Mis citas' },
     { to: '/chat', label: 'Asistente' },
+    { to: '/doctores', label: 'Doctores' },
     { to: '/perfil', label: 'Mi perfil' },
   ],
   DOCTOR: [

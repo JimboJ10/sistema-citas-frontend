@@ -12,6 +12,8 @@ import Agenda from './pages/Agenda/Agenda.jsx'
 import Admin from './pages/Admin/Admin.jsx'
 import Perfil from './pages/Perfil/Perfil.jsx'
 import NotFound from './pages/NotFound/NotFound.jsx'
+import Doctores from './pages/Doctores/Doctores.jsx'
+import DoctorDetalle from './pages/DoctorDetalle/DoctorDetalle.jsx'
 
 export default function App() {
   return (
@@ -20,6 +22,8 @@ export default function App() {
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/registro" element={<Registro />} />
+      <Route path="/doctores" element={<Doctores />} />
+      <Route path="/doctores/:id" element={<DoctorDetalle />} />
 
       {/* Comparten Navbar + contenedor via AppLayout, pero no todas requieren login */}
       <Route element={<AppLayout />}>

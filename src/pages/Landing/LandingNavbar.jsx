@@ -1,17 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
-/*
-  Navbar SOLO para la landing publica.
-  (El Navbar de las paginas internas es src/components/Navbar.jsx y no se toca.)
-
-  Se adapta al fondo sobre el que esta:
-  - Sobre el Hero (teal oscuro): texto claro + fondo oscuro translucido.
-  - Al hacer scroll y quedar sobre las secciones crema: texto oscuro +
-    fondo crema translucido.
-  La transicion se detecta observando el Hero con IntersectionObserver.
-*/
-
 const SECTIONS = [
   { href: '#por-que', label: 'Por que VitalCare' },
   { href: '#caracteristicas', label: 'Caracteristicas' },
@@ -27,7 +16,6 @@ export default function LandingNavbar() {
       setScrolled(true)
       return
     }
-    // Cuando el Hero deja de tocar la franja bajo la navbar (~72px) -> "scrolled".
     const observer = new IntersectionObserver(
       ([entry]) => setScrolled(!entry.isIntersecting),
       { rootMargin: '-72px 0px 0px 0px' },
@@ -35,6 +23,12 @@ export default function LandingNavbar() {
     observer.observe(hero)
     return () => observer.disconnect()
   }, [])
+
+  const linkClass = `rounded-md px-3 py-1.5 text-sm transition-colors duration-300 ${
+    scrolled
+      ? 'text-muted hover:text-ink'
+      : 'text-cream-100/75 hover:text-cream-50'
+  }`
 
   return (
     <header
@@ -56,16 +50,11 @@ export default function LandingNavbar() {
 
         <div className="flex items-center gap-2 md:gap-4">
           <div className="hidden items-center gap-1 md:flex">
+            <Link to="/doctores" className={linkClass}>
+              Doctores
+            </Link>
             {SECTIONS.map((section) => (
-              <a
-                key={section.href}
-                href={section.href}
-                className={`rounded-md px-3 py-1.5 text-sm transition-colors duration-300 ${
-                  scrolled
-                    ? 'text-muted hover:text-ink'
-                    : 'text-cream-100/75 hover:text-cream-50'
-                }`}
-              >
+              <a key={section.href} href={section.href} className={linkClass}>
                 {section.label}
               </a>
             ))}

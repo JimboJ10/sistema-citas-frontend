@@ -33,3 +33,12 @@ export async function listarHorariosDeDoctor(doctorId) {
   const { data } = await api.get(`/horarios/doctor/${doctorId}`)
   return data
 }
+
+/**
+ * @param {number} doctorId
+ * @returns {Promise<object>} detalle del doctor
+ */
+export async function obtenerDoctor(doctorId) {
+  const { data } = await api.get(`/doctores/${doctorId}`)
+  return data
+}
