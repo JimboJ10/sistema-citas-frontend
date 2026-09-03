@@ -10,6 +10,7 @@ import Citas from './pages/Citas/Citas.jsx'
 import Chat from './pages/Chat/Chat.jsx'
 import Agenda from './pages/Agenda/Agenda.jsx'
 import Admin from './pages/Admin/Admin.jsx'
+import Perfil from './pages/Perfil/Perfil.jsx'
 import NotFound from './pages/NotFound/NotFound.jsx'
 
 export default function App() {
@@ -31,6 +32,14 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={['PACIENTE']}>
               <Citas />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/perfil"
+          element={
+            <ProtectedRoute allowedRoles={['PACIENTE']}>
+              <Perfil />
             </ProtectedRoute>
           }
         />
