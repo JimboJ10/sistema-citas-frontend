@@ -6,6 +6,24 @@ import Field from '../../components/Field.jsx'
 import AuthAside from '../../components/AuthAside.jsx'
 import { register as registerRequest } from '../../api/auth.js'
 
+function validar(form) {
+  const errores = {}
+  if (!form.nombres.trim()) errores.nombres = 'Ingresa tus nombres.'
+  if (!form.apellidos.trim()) errores.apellidos = 'Ingresa tus apellidos.'
+  if (!form.telefono.trim()) errores.telefono = 'Ingresa tu teléfono.'
+  if (!form.username.trim()) {
+    errores.username = 'Elige un usuario.'
+  } else if (form.username.trim().length < 4) {
+    errores.username = 'El usuario debe tener al menos 4 caracteres.'
+  }
+  if (!form.password) {
+    errores.password = 'Elige una contraseña.'
+  } else if (form.password.length < 8) {
+    errores.password = 'La contraseña debe tener al menos 8 caracteres.'
+  }
+  return errores
+}
+
 export default function Registro() {
   const navigate = useNavigate()
 
@@ -16,18 +34,26 @@ export default function Registro() {
     apellidos: '',
     telefono: '',
   })
+  const [errores, setErrores] = useState({})
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
 
   function update(e) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+    setErrores((prev) => ({ ...prev, [e.target.name]: undefined }))
   }
 
   async function handleSubmit(e) {
     e.preventDefault()
     setError(null)
-    setLoading(true)
 
+    const erroresValidacion = validar(form)
+    if (Object.keys(erroresValidacion).length > 0) {
+      setErrores(erroresValidacion)
+      return
+    }
+
+    setLoading(true)
     try {
       await registerRequest(form)
       navigate('/login')
@@ -58,7 +84,7 @@ export default function Registro() {
             Completa tus datos para empezar a usar VitalCare.
           </p>
 
-          <form onSubmit={handleSubmit} className="mt-10 space-y-6">
+          <form onSubmit={handleSubmit} noValidate className="mt-10 space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <Field
                 label="Nombres"
@@ -68,6 +94,7 @@ export default function Registro() {
                 placeholder="María"
                 value={form.nombres}
                 onChange={update}
+                error={errores.nombres}
               />
               <Field
                 label="Apellidos"
@@ -77,6 +104,7 @@ export default function Registro() {
                 placeholder="Torres"
                 value={form.apellidos}
                 onChange={update}
+                error={errores.apellidos}
               />
             </div>
             <Field
@@ -88,6 +116,7 @@ export default function Registro() {
               placeholder="0991234567"
               value={form.telefono}
               onChange={update}
+              error={errores.telefono}
             />
             <Field
               label="Usuario"
@@ -97,6 +126,7 @@ export default function Registro() {
               placeholder="tu.usuario"
               value={form.username}
               onChange={update}
+              error={errores.username}
             />
             <Field
               label="Contraseña"
@@ -107,6 +137,7 @@ export default function Registro() {
               placeholder="Mínimo 8 caracteres"
               value={form.password}
               onChange={update}
+              error={errores.password}
             />
 
             {error && (

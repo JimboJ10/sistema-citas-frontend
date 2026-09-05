@@ -7,23 +7,38 @@ import AuthAside from '../../components/AuthAside.jsx'
 import { login as loginRequest } from '../../api/auth.js'
 import { useAuth } from '../../context/AuthContext.jsx'
 
+function validar(form) {
+  const errores = {}
+  if (!form.username.trim()) errores.username = 'Ingresa tu usuario.'
+  if (!form.password) errores.password = 'Ingresa tu contraseña.'
+  return errores
+}
+
 export default function Login() {
   const navigate = useNavigate()
   const { login } = useAuth()
 
   const [form, setForm] = useState({ username: '', password: '' })
+  const [errores, setErrores] = useState({})
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
 
   function update(e) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+    setErrores((prev) => ({ ...prev, [e.target.name]: undefined }))
   }
 
   async function handleSubmit(e) {
     e.preventDefault()
     setError(null)
-    setLoading(true)
 
+    const erroresValidacion = validar(form)
+    if (Object.keys(erroresValidacion).length > 0) {
+      setErrores(erroresValidacion)
+      return
+    }
+
+    setLoading(true)
     try {
       const data = await loginRequest(form)
       login(data.token, {
@@ -59,7 +74,7 @@ export default function Login() {
             Ingresa tus credenciales para acceder a tu panel.
           </p>
 
-          <form onSubmit={handleSubmit} className="mt-10 space-y-6">
+          <form onSubmit={handleSubmit} noValidate className="mt-10 space-y-6">
             <Field
               label="Usuario"
               id="username"
@@ -68,6 +83,7 @@ export default function Login() {
               placeholder="tu.usuario"
               value={form.username}
               onChange={update}
+              error={errores.username}
             />
             <Field
               label="Contraseña"
@@ -78,6 +94,7 @@ export default function Login() {
               placeholder="********"
               value={form.password}
               onChange={update}
+              error={errores.password}
             />
 
             {error && (

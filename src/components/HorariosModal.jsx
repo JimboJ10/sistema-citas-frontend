@@ -14,6 +14,16 @@ const DIAS = [
   'domingo',
 ]
 
+function validarHorario(horaInicio, horaFin) {
+  const errores = {}
+  if (!horaInicio) errores.horaInicio = 'Elige la hora de inicio.'
+  if (!horaFin) errores.horaFin = 'Elige la hora de fin.'
+  if (horaInicio && horaFin && horaFin <= horaInicio) {
+    errores.horaFin = 'Debe ser posterior a la hora de inicio.'
+  }
+  return errores
+}
+
 export default function HorariosModal({ doctor, onClose }) {
   const [horarios, setHorarios] = useState([])
   const [loading, setLoading] = useState(true)
@@ -22,6 +32,7 @@ export default function HorariosModal({ doctor, onClose }) {
   const [diaSemana, setDiaSemana] = useState(DIAS[0])
   const [horaInicio, setHoraInicio] = useState('')
   const [horaFin, setHoraFin] = useState('')
+  const [erroresHorario, setErroresHorario] = useState({})
   const [agregando, setAgregando] = useState(false)
 
   function cargarHorarios() {
@@ -36,12 +47,14 @@ export default function HorariosModal({ doctor, onClose }) {
 
   async function handleAgregar(e) {
     e.preventDefault()
-    if (!horaInicio || !horaFin) {
-      setError('Elige hora de inicio y fin.')
+    setError(null)
+
+    const erroresValidacion = validarHorario(horaInicio, horaFin)
+    if (Object.keys(erroresValidacion).length > 0) {
+      setErroresHorario(erroresValidacion)
       return
     }
 
-    setError(null)
     setAgregando(true)
     try {
       await crearHorario({ doctorId: doctor.id, diaSemana, horaInicio, horaFin })
@@ -121,7 +134,7 @@ export default function HorariosModal({ doctor, onClose }) {
             </p>
           )}
 
-          <form onSubmit={handleAgregar} className="space-y-3 border-t border-hairline pt-4">
+          <form onSubmit={handleAgregar} noValidate className="space-y-3 border-t border-hairline pt-4">
             <p className="text-sm font-medium text-ink">Agregar horario</p>
 
             <select
@@ -136,20 +149,41 @@ export default function HorariosModal({ doctor, onClose }) {
               ))}
             </select>
 
-            <div className="flex items-center gap-3">
-              <input
-                type="time"
-                value={horaInicio}
-                onChange={(e) => setHoraInicio(e.target.value)}
-                className="flex-1 rounded-lg border border-hairline bg-cream-50 px-3.5 py-2.5 text-sm text-ink outline-none transition-colors focus:border-brand-400 focus:ring-2 focus:ring-brand-500/15"
-              />
-              <span className="text-sm text-muted">a</span>
-              <input
-                type="time"
-                value={horaFin}
-                onChange={(e) => setHoraFin(e.target.value)}
-                className="flex-1 rounded-lg border border-hairline bg-cream-50 px-3.5 py-2.5 text-sm text-ink outline-none transition-colors focus:border-brand-400 focus:ring-2 focus:ring-brand-500/15"
-              />
+            <div>
+              <div className="flex items-center gap-3">
+                <input
+                  type="time"
+                  value={horaInicio}
+                  onChange={(e) => {
+                    setHoraInicio(e.target.value)
+                    setErroresHorario((prev) => ({ ...prev, horaInicio: undefined }))
+                  }}
+                  className={`flex-1 rounded-lg border bg-cream-50 px-3.5 py-2.5 text-sm text-ink outline-none transition-colors focus:ring-2 ${
+                    erroresHorario.horaInicio
+                      ? 'border-accent-400 focus:border-accent-400 focus:ring-accent-500/15'
+                      : 'border-hairline focus:border-brand-400 focus:ring-brand-500/15'
+                  }`}
+                />
+                <span className="text-sm text-muted">a</span>
+                <input
+                  type="time"
+                  value={horaFin}
+                  onChange={(e) => {
+                    setHoraFin(e.target.value)
+                    setErroresHorario((prev) => ({ ...prev, horaFin: undefined }))
+                  }}
+                  className={`flex-1 rounded-lg border bg-cream-50 px-3.5 py-2.5 text-sm text-ink outline-none transition-colors focus:ring-2 ${
+                    erroresHorario.horaFin
+                      ? 'border-accent-400 focus:border-accent-400 focus:ring-accent-500/15'
+                      : 'border-hairline focus:border-brand-400 focus:ring-brand-500/15'
+                  }`}
+                />
+              </div>
+              {(erroresHorario.horaInicio || erroresHorario.horaFin) && (
+                <p className="mt-1.5 text-xs text-accent-600">
+                  {erroresHorario.horaInicio ?? erroresHorario.horaFin}
+                </p>
+              )}
             </div>
 
             <button

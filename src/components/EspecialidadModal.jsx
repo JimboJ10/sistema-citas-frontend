@@ -8,15 +8,26 @@ export default function EspecialidadModal({ especialidad, onClose, onGuardada, o
 
   const [nombre, setNombre] = useState(especialidad?.nombre ?? '')
   const [descripcion, setDescripcion] = useState(especialidad?.descripcion ?? '')
+  const [errorNombre, setErrorNombre] = useState(null)
   const [enviando, setEnviando] = useState(false)
   const [eliminando, setEliminando] = useState(false)
   const [error, setError] = useState(null)
 
+  function updateNombre(e) {
+    setNombre(e.target.value)
+    setErrorNombre(null)
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
     setError(null)
-    setEnviando(true)
 
+    if (!nombre.trim()) {
+      setErrorNombre('El nombre es obligatorio.')
+      return
+    }
+
+    setEnviando(true)
     try {
       const payload = { nombre, descripcion: descripcion.trim() || null }
       if (esEdicion) {
@@ -66,7 +77,7 @@ export default function EspecialidadModal({ especialidad, onClose, onGuardada, o
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 px-5 py-5">
+        <form onSubmit={handleSubmit} noValidate className="space-y-4 px-5 py-5">
           <div>
             <label className="text-sm font-medium text-ink" htmlFor="nombre-esp">
               Nombre
@@ -74,10 +85,17 @@ export default function EspecialidadModal({ especialidad, onClose, onGuardada, o
             <input
               id="nombre-esp"
               value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
+              onChange={updateNombre}
               placeholder="Traumatología"
-              className="mt-2 block w-full rounded-lg border border-hairline bg-cream-50 px-3.5 py-2.5 text-sm text-ink outline-none transition-colors focus:border-brand-400 focus:ring-2 focus:ring-brand-500/15"
+              className={`mt-2 block w-full rounded-lg border bg-cream-50 px-3.5 py-2.5 text-sm text-ink outline-none transition-colors focus:ring-2 ${
+                errorNombre
+                  ? 'border-accent-400 focus:border-accent-400 focus:ring-accent-500/15'
+                  : 'border-hairline focus:border-brand-400 focus:ring-brand-500/15'
+              }`}
             />
+            {errorNombre && (
+              <p className="mt-1.5 text-xs text-accent-600">{errorNombre}</p>
+            )}
           </div>
 
           <div>
@@ -102,7 +120,7 @@ export default function EspecialidadModal({ especialidad, onClose, onGuardada, o
           <div className="flex items-center gap-3">
             <button
               type="submit"
-              disabled={enviando || !nombre.trim()}
+              disabled={enviando}
               className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-cream-50 shadow-sm transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {enviando ? (

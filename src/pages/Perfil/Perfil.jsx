@@ -5,6 +5,22 @@ import PageHeader from '../../components/PageHeader.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { obtenerPerfil, actualizarPerfil } from '../../api/perfil.js'
 
+function validar(form) {
+  const errores = {}
+  if (!form.nombres.trim()) errores.nombres = 'Ingresa tus nombres.'
+  if (!form.apellidos.trim()) errores.apellidos = 'Ingresa tus apellidos.'
+  if (!form.telefono.trim()) errores.telefono = 'Ingresa tu teléfono.'
+  return errores
+}
+
+function inputClass(hasError) {
+  return `mt-2 block w-full rounded-lg border bg-cream-50 px-3.5 py-2.5 text-sm text-ink outline-none transition-colors focus:ring-2 ${
+    hasError
+      ? 'border-accent-400 focus:border-accent-400 focus:ring-accent-500/15'
+      : 'border-hairline focus:border-brand-400 focus:ring-brand-500/15'
+  }`
+}
+
 export default function Perfil() {
   const { user } = useAuth()
 
@@ -15,6 +31,7 @@ export default function Perfil() {
     telefono: '',
     fechaNacimiento: '',
   })
+  const [errores, setErrores] = useState({})
   const [loading, setLoading] = useState(true)
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState(null)
@@ -40,14 +57,21 @@ export default function Perfil() {
   function update(e) {
     setGuardado(false)
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+    setErrores((prev) => ({ ...prev, [e.target.name]: undefined }))
   }
 
   async function handleSubmit(e) {
     e.preventDefault()
     setError(null)
-    setGuardando(true)
     setGuardado(false)
 
+    const erroresValidacion = validar(form)
+    if (Object.keys(erroresValidacion).length > 0) {
+      setErrores(erroresValidacion)
+      return
+    }
+
+    setGuardando(true)
     try {
       await actualizarPerfil(user.pacienteId, {
         ...form,
@@ -77,7 +101,7 @@ export default function Perfil() {
           Cargando tu perfil...
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="max-w-md space-y-5">
+        <form onSubmit={handleSubmit} noValidate className="max-w-md space-y-5">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-ink" htmlFor="nombres">
@@ -88,8 +112,11 @@ export default function Perfil() {
                 name="nombres"
                 value={form.nombres}
                 onChange={update}
-                className="mt-2 block w-full rounded-lg border border-hairline bg-cream-50 px-3.5 py-2.5 text-sm text-ink outline-none transition-colors focus:border-brand-400 focus:ring-2 focus:ring-brand-500/15"
+                className={inputClass(errores.nombres)}
               />
+              {errores.nombres && (
+                <p className="mt-1.5 text-xs text-accent-600">{errores.nombres}</p>
+              )}
             </div>
             <div>
               <label className="text-sm font-medium text-ink" htmlFor="apellidos">
@@ -100,8 +127,11 @@ export default function Perfil() {
                 name="apellidos"
                 value={form.apellidos}
                 onChange={update}
-                className="mt-2 block w-full rounded-lg border border-hairline bg-cream-50 px-3.5 py-2.5 text-sm text-ink outline-none transition-colors focus:border-brand-400 focus:ring-2 focus:ring-brand-500/15"
+                className={inputClass(errores.apellidos)}
               />
+              {errores.apellidos && (
+                <p className="mt-1.5 text-xs text-accent-600">{errores.apellidos}</p>
+              )}
             </div>
           </div>
 
@@ -114,8 +144,11 @@ export default function Perfil() {
               name="telefono"
               value={form.telefono}
               onChange={update}
-              className="mt-2 block w-full rounded-lg border border-hairline bg-cream-50 px-3.5 py-2.5 text-sm text-ink outline-none transition-colors focus:border-brand-400 focus:ring-2 focus:ring-brand-500/15"
+              className={inputClass(errores.telefono)}
             />
+            {errores.telefono && (
+              <p className="mt-1.5 text-xs text-accent-600">{errores.telefono}</p>
+            )}
           </div>
 
           <div>
@@ -128,7 +161,7 @@ export default function Perfil() {
               type="email"
               value={form.email}
               onChange={update}
-              className="mt-2 block w-full rounded-lg border border-hairline bg-cream-50 px-3.5 py-2.5 text-sm text-ink outline-none transition-colors focus:border-brand-400 focus:ring-2 focus:ring-brand-500/15"
+              className={inputClass(false)}
             />
           </div>
 
@@ -142,7 +175,7 @@ export default function Perfil() {
               type="date"
               value={form.fechaNacimiento}
               onChange={update}
-              className="mt-2 block w-full rounded-lg border border-hairline bg-cream-50 px-3.5 py-2.5 text-sm text-ink outline-none transition-colors focus:border-brand-400 focus:ring-2 focus:ring-brand-500/15"
+              className={inputClass(false)}
             />
           </div>
 

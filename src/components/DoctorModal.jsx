@@ -3,6 +3,29 @@ import { X, Loader2, Trash2 } from 'lucide-react'
 
 import { crearDoctor, editarDoctor, eliminarDoctor } from '../api/admin.js'
 
+function validar(form, especialidadesElegidas) {
+  const errores = {}
+  if (!form.nombres.trim()) errores.nombres = 'Ingresa los nombres.'
+  if (!form.apellidos.trim()) errores.apellidos = 'Ingresa los apellidos.'
+  if (!form.email.trim()) {
+    errores.email = 'Ingresa un email.'
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    errores.email = 'El email no tiene un formato válido.'
+  }
+  if (especialidadesElegidas.length === 0) {
+    errores.especialidades = 'Elige al menos una especialidad.'
+  }
+  return errores
+}
+
+function inputClass(hasError) {
+  return `mt-2 block w-full rounded-lg border bg-cream-50 px-3.5 py-2.5 text-sm text-ink outline-none transition-colors focus:ring-2 ${
+    hasError
+      ? 'border-accent-400 focus:border-accent-400 focus:ring-accent-500/15'
+      : 'border-hairline focus:border-brand-400 focus:ring-brand-500/15'
+  }`
+}
+
 export default function DoctorModal({ doctor, especialidades, onClose, onGuardado, onEliminado }) {
   const esEdicion = Boolean(doctor)
 
@@ -15,31 +38,34 @@ export default function DoctorModal({ doctor, especialidades, onClose, onGuardad
   const [especialidadesElegidas, setEspecialidadesElegidas] = useState(
     doctor?.especialidades?.map((e) => e.id) ?? []
   )
+  const [errores, setErrores] = useState({})
   const [enviando, setEnviando] = useState(false)
   const [eliminando, setEliminando] = useState(false)
   const [error, setError] = useState(null)
 
   function update(e) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+    setErrores((prev) => ({ ...prev, [e.target.name]: undefined }))
   }
 
   function alternarEspecialidad(id) {
     setEspecialidadesElegidas((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     )
+    setErrores((prev) => ({ ...prev, especialidades: undefined }))
   }
 
   async function handleSubmit(e) {
     e.preventDefault()
+    setError(null)
 
-    if (especialidadesElegidas.length === 0) {
-      setError('Elige al menos una especialidad.')
+    const erroresValidacion = validar(form, especialidadesElegidas)
+    if (Object.keys(erroresValidacion).length > 0) {
+      setErrores(erroresValidacion)
       return
     }
 
-    setError(null)
     setEnviando(true)
-
     try {
       const payload = { ...form, especialidadIds: especialidadesElegidas }
       if (esEdicion) {
@@ -88,7 +114,7 @@ export default function DoctorModal({ doctor, especialidades, onClose, onGuardad
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="max-h-[28rem] space-y-4 overflow-y-auto px-5 py-5">
+        <form onSubmit={handleSubmit} noValidate className="max-h-[28rem] space-y-4 overflow-y-auto px-5 py-5">
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-sm font-medium text-ink" htmlFor="nombres">
@@ -99,8 +125,11 @@ export default function DoctorModal({ doctor, especialidades, onClose, onGuardad
                 name="nombres"
                 value={form.nombres}
                 onChange={update}
-                className="mt-2 block w-full rounded-lg border border-hairline bg-cream-50 px-3.5 py-2.5 text-sm text-ink outline-none transition-colors focus:border-brand-400 focus:ring-2 focus:ring-brand-500/15"
+                className={inputClass(errores.nombres)}
               />
+              {errores.nombres && (
+                <p className="mt-1.5 text-xs text-accent-600">{errores.nombres}</p>
+              )}
             </div>
             <div>
               <label className="text-sm font-medium text-ink" htmlFor="apellidos">
@@ -111,8 +140,11 @@ export default function DoctorModal({ doctor, especialidades, onClose, onGuardad
                 name="apellidos"
                 value={form.apellidos}
                 onChange={update}
-                className="mt-2 block w-full rounded-lg border border-hairline bg-cream-50 px-3.5 py-2.5 text-sm text-ink outline-none transition-colors focus:border-brand-400 focus:ring-2 focus:ring-brand-500/15"
+                className={inputClass(errores.apellidos)}
               />
+              {errores.apellidos && (
+                <p className="mt-1.5 text-xs text-accent-600">{errores.apellidos}</p>
+              )}
             </div>
           </div>
 
@@ -126,8 +158,11 @@ export default function DoctorModal({ doctor, especialidades, onClose, onGuardad
               type="email"
               value={form.email}
               onChange={update}
-              className="mt-2 block w-full rounded-lg border border-hairline bg-cream-50 px-3.5 py-2.5 text-sm text-ink outline-none transition-colors focus:border-brand-400 focus:ring-2 focus:ring-brand-500/15"
+              className={inputClass(errores.email)}
             />
+            {errores.email && (
+              <p className="mt-1.5 text-xs text-accent-600">{errores.email}</p>
+            )}
           </div>
 
           <div>
@@ -139,7 +174,7 @@ export default function DoctorModal({ doctor, especialidades, onClose, onGuardad
               name="telefono"
               value={form.telefono}
               onChange={update}
-              className="mt-2 block w-full rounded-lg border border-hairline bg-cream-50 px-3.5 py-2.5 text-sm text-ink outline-none transition-colors focus:border-brand-400 focus:ring-2 focus:ring-brand-500/15"
+              className={inputClass(false)}
             />
           </div>
 
@@ -164,6 +199,9 @@ export default function DoctorModal({ doctor, especialidades, onClose, onGuardad
                 )
               })}
             </div>
+            {errores.especialidades && (
+              <p className="mt-1.5 text-xs text-accent-600">{errores.especialidades}</p>
+            )}
           </div>
 
           {error && (
