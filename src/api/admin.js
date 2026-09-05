@@ -29,3 +29,14 @@ export async function crearAccesoDoctor(payload) {
   })
   return data
 }
+
+/** @param {number} id @param {{ nombre: string, descripcion?: string }} payload */
+export async function editarEspecialidad(id, payload) {
+  const { data } = await api.put(`/especialidades/${id}`, payload)
+  return data
+}
+
+/** @param {number} id */
+export async function eliminarEspecialidad(id) {
+  await api.delete(`/especialidades/${id}`)
+}

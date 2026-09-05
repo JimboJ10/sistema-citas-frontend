@@ -4,7 +4,7 @@ import { Plus, Stethoscope, Loader2, KeyRound, Clock, CalendarClock } from 'luci
 import CrearAccesoModal from '../../components/CrearAccesoModal.jsx'
 import PageHeader from '../../components/PageHeader.jsx'
 import NuevoDoctorModal from '../../components/NuevoDoctorModal.jsx'
-import NuevaEspecialidadModal from '../../components/NuevaEspecialidadModal.jsx'
+import EspecialidadModal from '../../components/EspecialidadModal.jsx'
 import HorariosModal from '../../components/HorariosModal.jsx'
 import { listarDoctores, listarEspecialidades } from '../../api/catalogo.js'
 import { listarTodasLasCitas } from '../../api/citas.js'
@@ -51,6 +51,7 @@ export default function Admin() {
   const [modalEspecialidadAbierto, setModalEspecialidadAbierto] = useState(false)
   const [doctorParaAcceso, setDoctorParaAcceso] = useState(null)
   const [doctorParaHorarios, setDoctorParaHorarios] = useState(null)
+  const [especialidadEditando, setEspecialidadEditando] = useState(null)
 
   function cargarDatos() {
     setLoading(true)
@@ -172,12 +173,13 @@ export default function Admin() {
             </h2>
             <ul className="mt-4 flex flex-wrap gap-2">
               {especialidades.map((esp) => (
-                <li
-                  key={esp.id}
-                  className="rounded-lg border border-hairline bg-cream-50 px-3 py-1.5 text-sm text-ink"
-                >
-                  {esp.nombre}
-                </li>
+              <li
+                key={esp.id}
+                onClick={() => setEspecialidadEditando(esp)}
+                className="cursor-pointer rounded-lg border border-hairline bg-cream-50 px-3 py-1.5 text-sm text-ink transition-colors hover:border-brand-300"
+              >
+              {esp.nombre}
+            </li>
               ))}
               <li>
                 <button
@@ -247,10 +249,25 @@ export default function Admin() {
       )}
 
       {modalEspecialidadAbierto && (
-        <NuevaEspecialidadModal
+        <EspecialidadModal
           onClose={() => setModalEspecialidadAbierto(false)}
-          onCreada={() => {
+          onGuardada={() => {
             setModalEspecialidadAbierto(false)
+            cargarDatos()
+          }}
+        />
+      )}
+
+      {especialidadEditando && (
+        <EspecialidadModal
+          especialidad={especialidadEditando}
+          onClose={() => setEspecialidadEditando(null)}
+          onGuardada={() => {
+            setEspecialidadEditando(null)
+            cargarDatos()
+          }}
+          onEliminada={() => {
+            setEspecialidadEditando(null)
             cargarDatos()
           }}
         />
