@@ -40,7 +40,7 @@ export default function Navbar() {
 
   function handleLogout() {
     logout()
-    navigate('/login', { replace: true })
+    navigate('/', { replace: true })
   }
 
   return (
