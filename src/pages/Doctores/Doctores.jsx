@@ -17,7 +17,7 @@ export default function Doctores() {
   }, [])
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-6 py-16 lg:px-10">
+    <>
       <p className="text-xs font-medium uppercase tracking-[0.14em] text-brand-500">
         Equipo médico
       </p>
@@ -69,6 +69,6 @@ export default function Doctores() {
           ))}
         </section>
       )}
-    </div>
+    </>
   )
 }

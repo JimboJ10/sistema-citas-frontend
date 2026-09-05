@@ -22,13 +22,13 @@ export default function App() {
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/registro" element={<Registro />} />
-      <Route path="/doctores" element={<Doctores />} />
-      <Route path="/doctores/:id" element={<DoctorDetalle />} />
 
       {/* Comparten Navbar + contenedor via AppLayout, pero no todas requieren login */}
       <Route element={<AppLayout />}>
         {/* Publica: el chatbot puede usarse sin cuenta (paciente invitado) */}
         <Route path="/chat" element={<Chat />} />
+        <Route path="/doctores" element={<Doctores />} />
+        <Route path="/doctores/:id" element={<DoctorDetalle />} />
 
         {/* Protegidas por rol */}
         <Route

@@ -22,7 +22,7 @@ export default function DoctorDetalle() {
   }, [id])
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-6 py-16 lg:px-10">
+    <>
       <Link
         to="/doctores"
         className="inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-ink"
@@ -114,6 +114,6 @@ export default function DoctorDetalle() {
           </Link>
         </div>
       )}
-    </div>
+    </>
   )
 }
