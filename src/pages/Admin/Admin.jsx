@@ -3,7 +3,7 @@ import { Plus, Stethoscope, Loader2, KeyRound, Clock, CalendarClock } from 'luci
 
 import CrearAccesoModal from '../../components/CrearAccesoModal.jsx'
 import PageHeader from '../../components/PageHeader.jsx'
-import NuevoDoctorModal from '../../components/NuevoDoctorModal.jsx'
+import DoctorModal from '../../components/DoctorModal.jsx'
 import EspecialidadModal from '../../components/EspecialidadModal.jsx'
 import HorariosModal from '../../components/HorariosModal.jsx'
 import { listarDoctores, listarEspecialidades } from '../../api/catalogo.js'
@@ -52,6 +52,7 @@ export default function Admin() {
   const [doctorParaAcceso, setDoctorParaAcceso] = useState(null)
   const [doctorParaHorarios, setDoctorParaHorarios] = useState(null)
   const [especialidadEditando, setEspecialidadEditando] = useState(null)
+  const [doctorEditando, setDoctorEditando] = useState(null)
 
   function cargarDatos() {
     setLoading(true)
@@ -141,6 +142,13 @@ export default function Admin() {
                     </span>
                   ))}
                 </div>
+
+                <button
+                  onClick={() => setDoctorEditando(doc)}
+                  className="mt-3 text-xs font-medium text-muted transition-colors hover:text-brand-600"
+                >
+                  Editar información
+                </button>
 
                 <div className="mt-4 flex items-center justify-between">
                   {doc.tieneAcceso ? (
@@ -238,11 +246,27 @@ export default function Admin() {
       )}
 
       {modalDoctorAbierto && (
-        <NuevoDoctorModal
+        <DoctorModal
           especialidades={especialidades}
           onClose={() => setModalDoctorAbierto(false)}
-          onCreado={() => {
+          onGuardado={() => {
             setModalDoctorAbierto(false)
+            cargarDatos()
+          }}
+        />
+      )}
+
+      {doctorEditando && (
+        <DoctorModal
+          doctor={doctorEditando}
+          especialidades={especialidades}
+          onClose={() => setDoctorEditando(null)}
+          onGuardado={() => {
+            setDoctorEditando(null)
+            cargarDatos()
+          }}
+          onEliminado={() => {
+            setDoctorEditando(null)
             cargarDatos()
           }}
         />

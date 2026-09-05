@@ -40,3 +40,14 @@ export async function editarEspecialidad(id, payload) {
 export async function eliminarEspecialidad(id) {
   await api.delete(`/especialidades/${id}`)
 }
+
+/** @param {number} id @param {{ nombres: string, apellidos: string, email: string, telefono?: string, especialidadIds: number[] }} payload */
+export async function editarDoctor(id, payload) {
+  const { data } = await api.put(`/doctores/${id}`, payload)
+  return data
+}
+
+/** @param {number} id */
+export async function eliminarDoctor(id) {
+  await api.delete(`/doctores/${id}`)
+}

@@ -1,17 +1,22 @@
 import { useState } from 'react'
-import { X, Loader2 } from 'lucide-react'
+import { X, Loader2, Trash2 } from 'lucide-react'
 
-import { crearDoctor } from '../api/admin.js'
+import { crearDoctor, editarDoctor, eliminarDoctor } from '../api/admin.js'
 
-export default function NuevoDoctorModal({ especialidades, onClose, onCreado }) {
+export default function DoctorModal({ doctor, especialidades, onClose, onGuardado, onEliminado }) {
+  const esEdicion = Boolean(doctor)
+
   const [form, setForm] = useState({
-    nombres: '',
-    apellidos: '',
-    email: '',
-    telefono: '',
+    nombres: doctor?.nombres ?? '',
+    apellidos: doctor?.apellidos ?? '',
+    email: doctor?.email ?? '',
+    telefono: doctor?.telefono ?? '',
   })
-  const [especialidadesElegidas, setEspecialidadesElegidas] = useState([])
+  const [especialidadesElegidas, setEspecialidadesElegidas] = useState(
+    doctor?.especialidades?.map((e) => e.id) ?? []
+  )
   const [enviando, setEnviando] = useState(false)
+  const [eliminando, setEliminando] = useState(false)
   const [error, setError] = useState(null)
 
   function update(e) {
@@ -36,13 +41,34 @@ export default function NuevoDoctorModal({ especialidades, onClose, onCreado }) 
     setEnviando(true)
 
     try {
-      await crearDoctor({ ...form, especialidadIds: especialidadesElegidas })
-      onCreado()
+      const payload = { ...form, especialidadIds: especialidadesElegidas }
+      if (esEdicion) {
+        await editarDoctor(doctor.id, payload)
+      } else {
+        await crearDoctor(payload)
+      }
+      onGuardado()
     } catch (err) {
-      const mensaje = err.response?.data?.error ?? 'No se pudo crear el doctor.'
+      const mensaje = err.response?.data?.error ?? 'No se pudo guardar el doctor.'
       setError(mensaje)
     } finally {
       setEnviando(false)
+    }
+  }
+
+  async function handleEliminar() {
+    if (!window.confirm(`¿Eliminar a ${doctor.nombres} ${doctor.apellidos}?`)) return
+
+    setError(null)
+    setEliminando(true)
+    try {
+      await eliminarDoctor(doctor.id)
+      onEliminado()
+    } catch (err) {
+      const mensaje =
+        err.response?.data?.error ?? 'No se pudo eliminar. Puede tener citas asociadas.'
+      setError(mensaje)
+      setEliminando(false)
     }
   }
 
@@ -50,7 +76,9 @@ export default function NuevoDoctorModal({ especialidades, onClose, onCreado }) 
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 px-4">
       <div className="w-full max-w-md rounded-xl border border-hairline bg-cream-50 shadow-lg">
         <div className="flex items-center justify-between border-b border-hairline px-5 py-4">
-          <h2 className="text-base font-medium text-ink">Nuevo doctor</h2>
+          <h2 className="text-base font-medium text-ink">
+            {esEdicion ? 'Editar doctor' : 'Nuevo doctor'}
+          </h2>
           <button
             onClick={onClose}
             className="text-muted transition-colors hover:text-ink"
@@ -144,17 +172,37 @@ export default function NuevoDoctorModal({ especialidades, onClose, onCreado }) 
             </p>
           )}
 
-          <button
-            type="submit"
-            disabled={enviando}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-cream-50 shadow-sm transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {enviando ? (
-              <Loader2 className="size-4 animate-spin" strokeWidth={1.75} />
-            ) : (
-              'Crear doctor'
+          <div className="flex items-center gap-3">
+            <button
+              type="submit"
+              disabled={enviando}
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-cream-50 shadow-sm transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {enviando ? (
+                <Loader2 className="size-4 animate-spin" strokeWidth={1.75} />
+              ) : esEdicion ? (
+                'Guardar cambios'
+              ) : (
+                'Crear doctor'
+              )}
+            </button>
+
+            {esEdicion && (
+              <button
+                type="button"
+                onClick={handleEliminar}
+                disabled={eliminando}
+                className="inline-flex items-center justify-center rounded-lg border border-hairline p-2.5 text-accent-600 transition-colors hover:border-accent-300 hover:bg-accent-50 disabled:cursor-not-allowed disabled:opacity-60"
+                aria-label="Eliminar doctor"
+              >
+                {eliminando ? (
+                  <Loader2 className="size-4 animate-spin" strokeWidth={1.75} />
+                ) : (
+                  <Trash2 className="size-4" strokeWidth={1.75} />
+                )}
+              </button>
             )}
-          </button>
+          </div>
         </form>
       </div>
     </div>
