@@ -4,10 +4,12 @@ import { getStoredToken } from '../context/AuthContext.jsx'
 
 /*
   Instancia base de axios para toda la app.
-  baseURL apunta a la API de Spring Boot ya existente.
+  baseURL viene de una variable de entorno (VITE_API_URL), configurada
+  distinto en desarrollo (.env.local) y en producción (Vercel).
+  Si no está definida, cae en localhost:8080 para desarrollo local.
 */
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:8080/api',
   headers: {
     'Content-Type': 'application/json',
   },
